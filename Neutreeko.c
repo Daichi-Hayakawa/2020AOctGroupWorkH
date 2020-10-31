@@ -118,10 +118,117 @@ void getMove(const int board[BOARD_LEN][BOARD_LEN], int ai, char move[MOVE_STR_N
     alphabeta(board, ai, ai, 0, -MAX_EVALUATION_V, MAX_EVALUATION_V, move);
 }
 
+void possible(const int board[5][5], int i, int j, int direction, int res[2]){
+    // function for getMoveList
+    // i, j : place to start moving
+    // direction
+    //   0: north
+    //   1: northeast
+    //   2: east
+    //   3: southeast
+    //   4: south
+    //   5: southwest
+    //   6: west
+    //   7: northwest
+    // res:
+    //    place you can move : {i, j}
+    //    no place to move : {-1, -1}
+    int i_, j_;
+    int res_i, res_j;
+    res_i = i;
+    res_j = j;
+    switch (direction){
+        case 0 : i_=-1; j_= 0; break;
+        case 1 : i_=-1; j_= 1; break;
+        case 2 : i_= 0; j_= 1; break;
+        case 3 : i_= 1; j_= 1; break;
+        case 4 : i_= 1; j_= 0; break;
+        case 5 : i_= 1; j_=-1; break;
+        case 6 : i_= 0; j_=-1; break;
+        case 7 : i_=-1; j_=-1; break;
+    }
+    while (0 <= res_i+i_ && res_i+i_ <= 4 &&
+           0 <= res_j+j_ && res_j+j_ <= 4 &&   //in the board?
+           board[res_i+i_][res_j+j_] == 0){    //no piece on the way?
+        res_i += i_;
+        res_j += j_;
+    }
+    if (res_i == i && res_j ==j){  // if no place to move...
+        res[0] = -1;
+        res[1] = -1;
+    }
+    else{     // found possible movement!
+        res[0] = res_i;
+        res[1] = res_j;
+    }
+}
+
+void convert(int res[2], int i, int j, char converted_res[5])
+{
+    // function for getMoveList
+    switch (i){
+        case 0 : converted_res[0] = '0'; break;
+        case 1 : converted_res[0] = '1'; break;
+        case 2 : converted_res[0] = '2'; break;
+        case 3 : converted_res[0] = '3'; break;
+        case 4 : converted_res[0] = '4'; break;
+    }
+    switch (j){
+        case 0 : converted_res[1] = 'A'; break;
+        case 1 : converted_res[1] = 'B'; break;
+        case 2 : converted_res[1] = 'C'; break;
+        case 3 : converted_res[1] = 'D'; break;
+        case 4 : converted_res[1] = 'E'; break;
+    }
+    switch (res[0]){
+        case 0 : converted_res[2] = '0'; break;
+        case 1 : converted_res[2] = '1'; break;
+        case 2 : converted_res[2] = '2'; break;
+        case 3 : converted_res[2] = '3'; break;
+        case 4 : converted_res[2] = '4'; break;
+    }
+    switch (res[1]){
+        case 0 : converted_res[3] = 'A'; break;
+        case 1 : converted_res[3] = 'B'; break;
+        case 2 : converted_res[3] = 'C'; break;
+        case 3 : converted_res[3] = 'D'; break;
+        case 4 : converted_res[3] = 'E'; break;
+    }
+    converted_res[4] = '\0';
+}
+
+
 void getMoveList(const int board[BOARD_LEN][BOARD_LEN], const int player, char moveList[MAX_MOVE_N][MOVE_STR_N]){
     //board ...盤面
     //player どっちの手番か　黒の番なら-1, 白の番なら1
     //moveList ...可能な指し手のリストの出力、可能な手が24個以上無いときはNUll文字列で埋める
+    int movelist_index=0;
+    int i, j;
+    int direction;
+    int res[2];
+    for (i=0;i<5;i++){
+        for (j=0;j<5;j++){
+            if (board[i][j] == player){
+                for (direction=0; direction<8; direction++){
+                    // direction
+                    //   0: north
+                    //   1: northeast
+                    //   2: east
+                    //   3: southeast
+                    //   4: south
+                    //   5: southwest
+                    //   6: west
+                    //   7: northwest
+                    possible(board, i, j, direction, res);
+                    // res : place you can move to (if no place → {-1,-1})
+                    if (res[0] != -1){   //found possible movement?
+                        convert(res, i, j, movelist[movelist_index]);
+                        movelist_index++;
+                    }
+                }
+            }
+        }
+    }
 }
 
 int getPieceN(const int board[BOARD_LEN][BOARD_LEN], int direction, int color, int index){
