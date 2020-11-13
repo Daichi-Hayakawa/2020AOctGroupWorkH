@@ -117,7 +117,7 @@ void getMove(const int board[BOARD_LEN][BOARD_LEN], int ai, char move[MOVE_STR_N
     //move ...出力する指し手
     alphabeta(board, ai, ai, 0, -MAX_EVALUATION_V, MAX_EVALUATION_V, move);
 }
-void possible(const int board[5][5], int i, int j, int direction, int res[2]){
+void possible(const int board[BOARD_LEN][BOARD_LEN], int i, int j, int direction, int res[2]){
     // i, j : place to start moving
     // direction
     //   0: north
@@ -224,9 +224,9 @@ void getMoveList(const int board[BOARD_LEN][BOARD_LEN], const int player, char m
             }
         }
     }
-    for (; movelist_index<25; movelist_index++){
+    for (; movelist_index < MAX_MOVE_N; movelist_index++){
         for (i=0; i<5; i++){
-            movelist[movelist_index][i] = '\0';
+            moveList[movelist_index][i] = '\0';
         }
     }
 }
